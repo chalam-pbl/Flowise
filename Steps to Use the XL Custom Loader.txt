@@ -1,0 +1,77 @@
+Steps to Use the Custom Loader
+1. In Flowise:
+
+    Go to Document Loaders → + Add Custom Loader
+
+    Name it: xlsx_process_loader
+
+    Paste the following code:
+
+===========
+
+import { Document } from 'langchain/document';
+import * as XLSX from 'xlsx';
+
+export default async function (input: {
+  filePath: string;
+}): Promise<Document[]> {
+  const { filePath } = input;
+
+  // Load the Excel workbook
+  const workbook = XLSX.readFile(filePath);
+  const sheetName = workbook.SheetNames[0]; // First sheet
+  const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+
+  const documents: Document[] = [];
+
+  for (const row of worksheet) {
+    // Customize this to format your desired output
+    const step = row["Step"] || row["Process"] || row[Object.keys(row)[0]];
+    const description = row["Description"] || "";
+    const link = row["Dashboard URL"] || row["URL"] || "";
+
+    let text = `**Step:** ${step}\n**Description:** ${description}`;
+    if (link && link.startsWith("http")) {
+      text += `\n[🔗 View Dashboard](${link})`;
+    }
+
+    documents.push(new Document({ pageContent: text }));
+  }
+
+  return documents;
+}
+
+====================
+
+2. Upload an .xlsx file
+
+    The sheet should have columns like:
+
+        Step / Process
+
+        Description
+
+        Dashboard URL or URL
+
+This loader:
+
+    Converts each row into a well-structured document
+
+    Formats long URLs as readable markdown buttons like:
+
+	[🔗 View Dashboard](https://...)
+
+3. Connect in Chatflow
+
+    Use a Document Loader node and select xlsx_process_loader
+
+    Connect it to your Chroma Vector Store
+
+✅ Benefits
+Feature	Benefit
+.xlsx support	No more messy .txt exports
+Markdown buttons	Cleaner UI with clickable links
+Token-safe rows	Avoids huge chunks from long raw URLs
+Customizable	You can tweak which columns to include
+
+
