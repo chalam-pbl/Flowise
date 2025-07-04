@@ -33,13 +33,6 @@
     "lint-staged": {
         "*.{js,jsx,ts,tsx,json,md}": "eslint --fix"
     },
-      "dependencies": {
-    // ... other Flowise dependencies
-    "puppeteer": "^21.0.0",                 // Or the version you prefer
-    "puppeteer-extra": "^11.0.0",            // Or the version you prefer
-    "puppeteer-extra-plugin-stealth": "^2.0.0", // Or the version you prefer
-    // ... rest of your dependencies
-  },
     "devDependencies": {
         "@babel/preset-env": "^7.19.4",
         "@babel/preset-typescript": "7.18.6",
