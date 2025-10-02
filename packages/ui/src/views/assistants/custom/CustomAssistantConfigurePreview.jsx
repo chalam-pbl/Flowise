@@ -167,9 +167,10 @@ const CustomAssistantConfigurePreview = () => {
 
     const checkInputParamsMandatory = () => {
         let canSubmit = true
-
-        const inputParams = (selectedChatModel.inputParams ?? []).filter((inputParam) => !inputParam.hidden)
-        for (const inputParam of inputParams) {
+        const visibleInputParams = showHideInputParams(selectedChatModel).filter(
+            (inputParam) => !inputParam.hidden && inputParam.display !== false
+        )
+        for (const inputParam of visibleInputParams) {
             if (!inputParam.optional && (!selectedChatModel.inputs[inputParam.name] || !selectedChatModel.credential)) {
                 if (inputParam.type === 'credential' && !selectedChatModel.credential) {
                     canSubmit = false
@@ -184,8 +185,10 @@ const CustomAssistantConfigurePreview = () => {
         if (selectedTools.length > 0) {
             for (let i = 0; i < selectedTools.length; i++) {
                 const tool = selectedTools[i]
-                const inputParams = (tool.inputParams ?? []).filter((inputParam) => !inputParam.hidden)
-                for (const inputParam of inputParams) {
+                const visibleInputParams = showHideInputParams(tool).filter(
+                    (inputParam) => !inputParam.hidden && inputParam.display !== false
+                )
+                for (const inputParam of visibleInputParams) {
                     if (!inputParam.optional && (!tool.inputs[inputParam.name] || !tool.credential)) {
                         if (inputParam.type === 'credential' && !tool.credential) {
                             canSubmit = false
@@ -510,7 +513,8 @@ const CustomAssistantConfigurePreview = () => {
         } else if (setting === 'viewMessages') {
             setViewMessagesDialogProps({
                 title: 'View Messages',
-                chatflow: canvas.chatflow
+                chatflow: canvas.chatflow,
+                isChatflow: false
             })
             setViewMessagesDialogOpen(true)
         } else if (setting === 'viewLeads') {
